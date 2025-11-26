@@ -1,0 +1,2902 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Виртуальды Анатомия Зертханасы</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a5f7a;
+            --secondary-color: #159895;
+            --accent-color: #57C5B6;
+            --light-color: #f8f9fa;
+            --dark-color: #002B5B;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: #333;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            min-height: 90vh;
+        }
+        
+        .header {
+            background: var(--dark-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            display: flex;
+            min-height: 700px;
+        }
+        
+        .image-section {
+            flex: 0 0 350px;
+            padding: 20px;
+            background: var(--light-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        .human-image-container {
+            width: 100%;
+            height: 400px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .human-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .controls-section {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-left: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .organ-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .organ-btn {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--light-color);
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+        
+        .organ-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .organ-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .organ-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+        
+        .organ-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .info-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--light-color);
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .default-message {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #6c757d;
+            font-size: 1.2em;
+        }
+        
+        .organ-detail {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .organ-image-container {
+            height: 400px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+        
+        .organ-illustration {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .organ-info {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .organ-info h2 {
+            color: var(--dark-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--dark-color);
+            padding-bottom: 5px;
+        }
+        
+        .organ-fact {
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            border-left: 4px solid #28a745;
+        }
+        
+        /* Sketchfab 3D модель контейнері */
+        .sketchfab-embed-wrapper {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .sketchfab-embed-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 10px;
+        }
+        
+        /* Тест сұрақтары стильдері */
+        .test-section {
+            margin-top: 30px;
+            border-top: 2px solid var(--dark-color);
+            padding-top: 20px;
+        }
+        
+        .test-question {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .test-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .test-option {
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .test-option:hover {
+            background: #f8f9fa;
+        }
+        
+        .test-option.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .test-option.correct {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        
+        .test-option.incorrect {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        
+        .test-option.show-correct {
+            background: #ffc107;
+            color: black;
+            border-color: #ffc107;
+        }
+        
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e2f0fb;
+            border-radius: 8px;
+        }
+        
+        .question-review {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #6c757d;
+        }
+        
+        .correct-answer {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .game-mode-selector {
+            margin: 15px 0;
+        }
+        
+        .mode-btn {
+            padding: 10px 20px;
+            margin: 0 5px;
+            border: 2px solid var(--primary-color);
+            background: white;
+            color: var(--primary-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .model-btn {
+            padding: 8px 15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .model-btn:hover {
+            background: var(--dark-color);
+            transform: translateY(-2px);
+        }
+        
+        .model-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .model-selector {
+            margin-bottom: 15px;
+        }
+        
+        .model-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .model-type-btn {
+            padding: 8px 15px;
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .model-type-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .all-questions-container {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .audio-player {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        /* Аудиоплеер стильдері */
+        .compact-audio-player {
+            width: 200px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            font-family: Arial, sans-serif;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .compact-progress-area {
+            margin-bottom: 6px;
+        }
+        
+        .compact-progress-bar {
+            height: 3px;
+            width: 100%;
+            background: #ddd;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        
+        .compact-progress {
+            height: 100%;
+            width: 0%;
+            background: #4a6ee0;
+            border-radius: 2px;
+            transition: width 0.1s linear;
+        }
+        
+        .compact-time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .compact-controls-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .compact-playback-controls {
+            display: flex;
+            align-items: center;
+        }
+        
+        .compact-control-btn {
+            background: none;
+            border: none;
+            font-size: 11px;
+            color: #555;
+            cursor: pointer;
+            padding: 3px 5px;
+            margin: 0 1px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .compact-control-btn:hover {
+            background: #eaeaea;
+        }
+        
+        .compact-play-pause {
+            background: #4a6ee0;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 9px;
+        }
+        
+        .compact-volume-control {
+            display: flex;
+            align-items: center;
+        }
+        
+        .compact-volume-slider {
+            width: 50px;
+            height: 3px;
+            background: #ddd;
+            border-radius: 2px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        .compact-volume-percent {
+            height: 100%;
+            width: 70%;
+            background: #4a6ee0;
+            border-radius: 2px;
+        }
+        
+        @media (max-width: 1200px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .image-section {
+                flex: 0 0 auto;
+                border-left: none;
+                border-bottom: 1px solid #dee2e6;
+            }
+            
+            .organ-buttons {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .organ-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .human-image-container {
+                height: 300px;
+            }
+            
+            .organ-image-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // React компонент
+        const { useState, useEffect, useRef } = React;
+
+        // Ағзалар туралы деректер - тек қазақ тілінде
+        const organData = {
+            brain: {
+                name: "Ми",
+                parts: 4,
+                function: "Ми - адамның орталық жүйке жүйесінің негізгі бөлігі. Ол бас сүйек ішінде орналасқан және барлық дене функцияларын басқарады. Ми ойлау, есте сақтау, сезім, эмоциялар, тіл, қозғалыс және ішкі ағзалардың жұмысын реттеу сияқты маңызды процестерді басқарады.",
+                details: {
+                    parts: [
+                        { name: "Үлкен ми", location: "top", description: "Ойлау, қозғалыс, сезім орталығы" },
+                        { name: "Мойын миы", location: "bottom", description: "Тыныс алу, жүрек соғуын реттеу" },
+                        { name: "Сұр зат", location: "middle", description: "Ақпаратты өңдеу орталығы" },
+                        { name: "Ақ зат", location: "center", description: "Нейрондарды байланыстыру" }
+                    ]
+                },
+                fact: "Ми 86 миллиард нейроннан тұрады және күніне 20 ватт энергия тұтынады. Ол дене салмағының шамамен 2% құрайды, бірақ денедегі оттегі мен глюкозаның 20% тұтынады.",
+                audioDescription: "audio/brain_description.mp3",
+                testQuestions: [
+                    {
+                        question: "Адам миы қай жүйеге жатады?",
+                        options: [
+                            "Тыныс алу жүйесі",
+                            "Қанайналым жүйесі",
+                            "Жүйке жүйесі",
+                            "Бұлшықет жүйесі"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Ми неше бөлімнен тұрады?",
+                        options: [
+                            "2",
+                            "3",
+                            "4",
+                            "5"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Үлкен ми сыңарларының қызметі:",
+                        options: [
+                            "Тыныс алуды реттеу",
+                            "Қимыл-қозғалысты, ойлауды, сезінуді басқару",
+                            "Қан қысымын реттеу",
+                            "Сілекей бөлінуін реттеу"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Мишықтың негізгі қызметі:",
+                        options: [
+                            "Сөйлеу",
+                            "Үйлестіру, тепе-теңдік",
+                            "Есту",
+                            "Эндокриндік реттеу"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Сопақша мида не реттеледі?",
+                        options: [
+                            "Көру",
+                            "Есту",
+                            "Тыныс алу, жүрек жұмысы",
+                            "Сөйлеу"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Ми қыртысы қандай ұлпадан тұрады?",
+                        options: [
+                            "Дәнекер ұлпадан",
+                            "Бұлшықет ұлпасынан",
+                            "Сұр заттан",
+                            "Ақ заттан"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Ақ заттың қызметі:",
+                        options: [
+                            "Қорғаныш",
+                            "Импульстарды өткізу",
+                            "Қимыл үйлестіру",
+                            "Тамыр түзу"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Ми салмағы шамамен қанша?",
+                        options: [
+                            "200–300 г",
+                            "500–700 г",
+                            "1–1,5 кг",
+                            "3 кг"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Үлкен ми сыңарларының қыртысында неше нейрон бар?",
+                        options: [
+                            "Миллионға жуық",
+                            "1–2 миллион",
+                            "1 миллиардтан астам",
+                            "10–20 мың"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Ми жарты шарларын жалғайтын құрылым:",
+                        options: [
+                            "Көпір",
+                            "Талақ",
+                            "Ми бағаны",
+                            "Мидың қалың комиссурасы (дөңгелек дене)"
+                        ],
+                        correctAnswer: 3
+                    },
+                    {
+                        question: "Көру аймағы қайда орналасқан?",
+                        options: [
+                            "Самай бөлігінде",
+                            "Шүйде бөлігінде",
+                            "Маңдай бөлігінде",
+                            "Төбе бөлігінде"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Есту аймағы орналасатын ми бөлігі:",
+                        options: [
+                            "Самай бөлігі",
+                            "Маңдай бөлігі",
+                            "Төбе бөлігі",
+                            "Мишық"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Сөйлеуге жауап беретін Брок аймағы қайда?",
+                        options: [
+                            "Маңдай қыртысында",
+                            "Шүйде бөлігінде",
+                            "Мишықта",
+                            "Ортаңғы мида"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Тепе-теңдік бұзылуы қай мидың зақымдалуынан болады?",
+                        options: [
+                            "Алдыңғы ми",
+                            "Ортаңғы ми",
+                            "Мишық",
+                            "Сопақша ми"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Мидағы сұйықтық қалай аталады?",
+                        options: [
+                            "Плазма",
+                            "Лимфа",
+                            "Жұлын-ми сұйықтығы",
+                            "Қан"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Мидың ең ірі бөлімі:",
+                        options: [
+                            "Мишық",
+                            "Сопақша ми",
+                            "Үлкен ми",
+                            "Мойын миы"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Ми қандай заттарды энергия көзі ретінде пайдаланады?",
+                        options: [
+                            "Майлар",
+                            "Ақуыздар",
+                            "Глюкоза және оттегі",
+                            "Минералдар"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Ми қыртысының қалыңдығы шамамен:",
+                        options: [
+                            "1–2 мм",
+                            "2–4 мм",
+                            "4–6 мм",
+                            "6–8 мм"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Мидың қан айналымын реттейтін бөлімі:",
+                        options: [
+                            "Гипоталамус",
+                            "Таламус",
+                            "Мишық",
+                            "Сопақша ми"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Мидың есту және көру рефлекстерін реттейтін бөлімі:",
+                        options: [
+                            "Төртөсті тақтайша",
+                            "Гипофиз",
+                            "Гипоталамус",
+                            "Ми бағаны"
+                        ],
+                        correctAnswer: 0
+                    }
+                ]
+            },
+            heart: {
+                name: "Жүрек",
+                parts: 4,
+                function: "Жүрек - бұл қан айналымы жүйесінің негізгі ағзасы. Ол төс қуысында орналасқан және қанды дене бойына айдап, оттегі мен қоректік заттарды барлық ұлпаларға таратады. Жүрек төрт камерадан тұрады: екі жүрекше және екі қарынша. Ол үздіксіз жұмыс істейді және күніне шамамен 100,000 рет соғады.",
+                details: {
+                    parts: [
+                        { name: "Оң жүрекше", location: "top-right", description: "Вена қанын қабылдайды" },
+                        { name: "Оң қарынша", location: "bottom-right", description: "Қанды өкпеге жібереді" },
+                        { name: "Сол жүрекше", location: "top-left", description: "Өкпеден тазаарған қанды қабылдайды" },
+                        { name: "Сол қарынша", location: "bottom-left", description: "Қанды аортаға айдайды" }
+                    ]
+                },
+                fact: "Жүрек күніне 100,000 рет соғады және тәулігіне 7,600 литр қан айдайды. Балалардың жүрегі ересектерге қарағанда жылдам соғады - жаңа туған нәрестенің жүрегі минутына 120-140 рет соғады.",
+                audioDescription: "audio/heart_description.mp3",
+                additionalModels: [
+                    {
+                        key: "heartThromb",
+                        name: "Қан тамырдағы тромб",
+                        description: "Тромб - қан тамырларында пайда болатын қан үйіршігі. Ол қан ағынын бұзып, инсульт немесе жүрек талмасына себеп бола алады. Тромбоз - бұл қан тамырларының ішінде қан үйіршіктерінің (тромбтардың) пайда болуы."
+                    }
+                ],
+                testQuestions: [
+                    {
+                        question: "Жүректің негізгі қызметі:",
+                        options: [
+                            "Нерв импульстарын өткізу",
+                            "Қанды ағза бойынша айдау",
+                            "Газ алмасу",
+                            "Энергия өндіру"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Адам жүрегі неше қуыстан тұрады?",
+                        options: [
+                            "2",
+                            "3",
+                            "4",
+                            "5"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Жүректің бұлшықет тіні қалай аталады?",
+                        options: [
+                            "Сезгіш эпителий",
+                            "Көлденең жолақты бұлшықет",
+                            "Жүрек бұлшықеті (миокард)",
+                            "Тегіс бұлшықет"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Жүрек қабығының сыртқы қабаты қалай аталады?",
+                        options: [
+                            "Эндокард",
+                            "Миокард",
+                            "Перикард",
+                            "Плевра"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Оң қарыншадан қан қайда айдалады?",
+                        options: [
+                            "Өкпеге",
+                            "Сол жүрекшеге",
+                            "Аортаға",
+                            "Ұсақ капиллярларға"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Сол қарыншадан қан қайда айдалады?",
+                        options: [
+                            "Өкпеге",
+                            "Дененің барлық бөлігіне (аортаға)",
+                            "Бүйрек венасына",
+                            "Созылмалы артерияға"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Жүректің «табиғи қоздырғыш орталығы» қалай аталады?",
+                        options: [
+                            "Атриовентрикулярлық түйін",
+                            "Синоатриалды (СА) түйін",
+                            "Гис шоғыры",
+                            "Пуркинье талшықтары"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Жүректің жиырылу фазасы қалай аталады?",
+                        options: [
+                            "Диастола",
+                            "Деполяризация",
+                            "Систола",
+                            "Ассимиляция"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Жүрек бұлшықетінің босаңсу фазасы:",
+                        options: [
+                            "Систола",
+                            "Диастола",
+                            "Импульс",
+                            "Реполяризация"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Адам жүрегі орта есеппен минутына неше рет соғады?",
+                        options: [
+                            "10–20",
+                            "20–30",
+                            "40–50",
+                            "60–80"
+                        ],
+                        correctAnswer: 3
+                    },
+                    {
+                        question: "Жүрек жұмысына жауапты ең негізгі элемент:",
+                        options: [
+                            "Жүрекшелер",
+                            "Қарыншалар",
+                            "Жүрек бұлшықетінің автоматиясы",
+                            "Тері рецепторлары"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Жүрекке оттек пен қоректік заттарды жеткізетін тамырлар:",
+                        options: [
+                            "Өкпе веналары",
+                            "Қуысты веналар",
+                            "Тәждік (коронарлық) артериялар",
+                            "Жүрек веналары"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Жүрекше мен қарынша арасындағы қақпақшалар қалай аталады?",
+                        options: [
+                            "Жарты ай тәрізді",
+                            "Атриовентрикулярлық",
+                            "Эндотелий",
+                            "Плевралық"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Сол жақ атриовентрикулярлық қақпақша қалай аталады?",
+                        options: [
+                            "Қос жармалы (митральды)",
+                            "Үш жармалы",
+                            "Жарты ай",
+                            "Веналық"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Жүректің өздігінен жиырылу қабілеті қалай аталады?",
+                        options: [
+                            "Жүйкелік реттелу",
+                            "Гормондық реттелу",
+                            "Автоматия",
+                            "Гомеостаз"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Қан жүректен шыққаннан кейін қай тамырмен ағады?",
+                        options: [
+                            "Капилляр",
+                            "Вена",
+                            "Артерия",
+                            "Лимфа тамыры"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Жүректің қызметі тоқтаған кезде қолданылатын алғашқы көмек:",
+                        options: [
+                            "Қан қысымын өлшеу",
+                            "Жасанды тыныс + жүрекке жанама массаж",
+                            "Тамырға дәрі жіберу",
+                            "Қатты тамақ беру"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Жүректің жұмысын жазып көрсететін құрал:",
+                        options: [
+                            "Спирометр",
+                            "Электрокардиограф (ЭКГ)",
+                            "Тонометр",
+                            "Микротом"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Артерия мен вена арасындағы ең ұсақ тамырлар:",
+                        options: [
+                            "Аорта",
+                            "Капиллярлар",
+                            "Лимфа тамырлары",
+                            "Альвеолалар"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Жүректің негізгі ырғағын реттеу қай жүйе арқылы жүреді?",
+                        options: [
+                            "Тыныс алу жүйесі",
+                            "Ас қорыту жүйесі",
+                            "Жүйке жүйесі",
+                            "Зәр шығару жүйесі"
+                        ],
+                        correctAnswer: 2
+                    }
+                ]
+            },
+            lungs: {
+                name: "Өкпе",
+                parts: 2,
+                function: "Өкпе - тыныс алу жүйесінің негізгі ағзасы. Ол кеуде қуысында орналасқан және газ алмасу процесін жүзеге асырады. Өкпелер арқылы оттегі қанға өтеді, ал көмірқышқыл газы сыртқа шығарылады. Өкпе альвеолаларының жалпы ауданы 70-100 шаршы метрді құрайды.",
+                details: {
+                    parts: [
+                        { name: "Сол өкпе", location: "left", description: "2 бөлімшеден тұрады" },
+                        { name: "Оң өкпе", location: "right", description: "3 бөлімшеден тұрады" }
+                    ]
+                },
+                fact: "Өкпеде 300-500 миллион альвеола бар. Адам күніне шамамен 11,000 литр ауа жұтады.",
+                audioDescription: "audio/lungs_description.mp3",
+                testQuestions: [
+                    {
+                        question: "Өкпе қандай жүйеге жатады?",
+                        options: [
+                            "Қанайналым жүйесі",
+                            "Тыныс алу жүйесі",
+                            "Ас қорыту жүйесі",
+                            "Зәр шығару жүйесі"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Адамда өкпе саны:",
+                        options: [
+                            "1",
+                            "2",
+                            "3",
+                            "4"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Өкпенің негізгі қызметі:",
+                        options: [
+                            "Қоректік заттарды ыдырату",
+                            "Қанды тазаарту",
+                            "Газ алмасу (O₂ мен CO₂ алмасу)",
+                            "Қан жасау"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Өкпе қай қуыста орналасады?",
+                        options: [
+                            "Құрсақ қуысында",
+                            "Кеуде қуысында",
+                            "Жамбас қуысында",
+                            "Бас қуысының ішінде"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Ауа өкпеге қандай құрылым арқылы кіреді?",
+                        options: [
+                            "Өңеш",
+                            "Жұтқыншақ",
+                            "Кеңірдек",
+                            "Қылтамыр"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Кіші бронхылар мен альвеолалар орналасатын аймақ:",
+                        options: [
+                            "Қан тамыр жүйесі",
+                            "Өкпе тіндері",
+                            "Ас қорыту жолдары",
+                            "Омыртқа жотасы"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Альвеолалардың негізгі қызметі:",
+                        options: [
+                            "Қан өндіру",
+                            "Ауаны ылғалдандыру",
+                            "Газ алмасу",
+                            "Шлактарды шығару"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Өкпе альвеолаларының қабырғасы қандай ұлпадан тұрады?",
+                        options: [
+                            "Бұлшықет ұлпасы",
+                            "Дәнекер ұлпасы",
+                            "Бір қабатты эпителий",
+                            "Көп қабатты эпителий"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Өкпе қабынуы қалай аталады?",
+                        options: [
+                            "Бронхит",
+                            "Тонзиллит",
+                            "Пневмония",
+                            "Гастрит"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Оң өкпенің бөліктері:",
+                        options: [
+                            "2 бөлік",
+                            "3 бөлік",
+                            "4 бөлік",
+                            "1 бөлік"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Сол өкпенің бөліктері:",
+                        options: [
+                            "1 бөлік",
+                            "2 бөлік",
+                            "3 бөлік",
+                            "4 бөлік"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Тыныс алу жиілігі ересек адамда минутына шамамен:",
+                        options: [
+                            "5–7 рет",
+                            "8–10 рет",
+                            "12–18 рет",
+                            "25–30 рет"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Өкпені сыртынан қаптап тұратын қабық:",
+                        options: [
+                            "Сірлі қабық",
+                            "Плевра",
+                            "Перикард",
+                            "Дерма"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Тыныс алудың басты қаңқа-бұлшықет құрылымы:",
+                        options: [
+                            "Иық бұлшықеті",
+                            "Жамбас бұлшықеті",
+                            "Диафрагма",
+                            "Жүрекше"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Өкпеде қан тамырларының қай түрі өте көп таралған?",
+                        options: [
+                            "Артериялар",
+                            "Веналар",
+                            "Капиллярлар",
+                            "Лимфа тамырлары"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Өкпедегі газ алмасу негізінен қай жерде жүреді?",
+                        options: [
+                            "Бронхыларда",
+                            "Трахеяда",
+                            "Альвеолаларда",
+                            "Плеврада"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Өкпе қан айналымының қай түріне қатысады?",
+                        options: [
+                            "Үлкен қан айналымы",
+                            "Кіші қан айналымы",
+                            "Портальдық қан айналымы",
+                            "Лимфа айналымы"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Өкпенің негізгі қорғаныш механизмі:",
+                        options: [
+                            "Температураны төмендету",
+                            "Тозаңды сүзу",
+                            "Иммундық жауап",
+                            "Микроорганизмдерді жою"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Өкпе қызметін бақылайтын негізгі орталық:",
+                        options: [
+                            "Жүрек",
+                            "Мидың тыныс алу орталығы",
+                            "Бауыр",
+                            "Бүйрек"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Өкпе ауруларын диагностикалауда қолданылатын негізгі әдіс:",
+                        options: [
+                            "ЭКГ",
+                            "Рентген",
+                            "УЗИ",
+                            "ЭЭГ"
+                        ],
+                        correctAnswer: 1
+                    }
+                ]
+            },
+            liver: {
+                name: "Бауыр",
+                parts: 2,
+                function: "Бауыр - денедегі ең ірі ішкі ағза. Ол зат алмасу, детоксикация, заттарды синтездеу және сақтау функцияларын орындайды. Бауыр қанды тазартады, өт шығарады, қан үю факторларын түзеді және қоректік заттарды жинақтайды.",
+                details: {
+                    parts: [
+                        { name: "Оң бөлік", location: "right", description: "Ірі бөлік" },
+                        { name: "Сол бөлік", location: "left", description: "Кіші бөлік" },
+                        { name: "Өт жолы", location: "bottom", description: "Өт шығарады" }
+                    ]
+                },
+                fact: "Бауыр 500-ден астам функцияны орындайды және өзін толық жаңарта алады. Ол денедегі ең ірі ішкі ағза болып табылады.",
+                audioDescription: "audio/liver_description.mp3",
+                testQuestions: [
+                    {
+                        question: "Бауыр адамның қай қуысында орналасқан?",
+                        options: [
+                            "Кеуде қуысында",
+                            "Бассүйекте",
+                            "Құрсақ қуысында, оң жақта",
+                            "Жамбас қуысында"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Бауырдың негізгі қызметтерінің бірі:",
+                        options: [
+                            "Оттекті тасымалдау",
+                            "Өт өндіру",
+                            "Жүйке импульсын өткізу",
+                            "Қан қысымын реттеу"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бауыр жасушалары қалай аталады?",
+                        options: [
+                            "Нейрондар",
+                            "Эритроциттер",
+                            "Гепатоциттер",
+                            "Лейкоциттер"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Бауырда жиналатын негізгі қор зат:",
+                        options: [
+                            "Ақуыз",
+                            "Көкөніс талшықтары",
+                            "Гликоген",
+                            "Витамин D"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Өттің негізгі қызметі:",
+                        options: [
+                            "Қан жасау",
+                            "Майлардың эмульсиялануы",
+                            "Су буландыру",
+                            "Глюкоза синтездеу"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бауыр қан айналымының қандай түріне қатысады?",
+                        options: [
+                            "Үлкен қан айналымына",
+                            "Кіші қан айналымына",
+                            "Портальдық (қақпа) қан айналымына",
+                            "Лимфа айналымына"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Бауыр қандай мүшеге жатады?",
+                        options: [
+                            "Эндокринді",
+                            "Тірек-қимыл",
+                            "Ас қорыту жүйесіне",
+                            "Зәр шығару жүйесіне"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Бауыр қандай зиянды заттарды залалсыздандырады?",
+                        options: [
+                            "Тек дәрумендер",
+                            "Тек ақуыздар",
+                            "Токсиндер мен дәрі қалдықтары",
+                            "Тек көмірсулар"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Бауырда қандай витаминдер қоры жиналады?",
+                        options: [
+                            "C және B₁₂",
+                            "A, D, E, K",
+                            "B₁ және N",
+                            "K және P"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бауырдың ең жарық түсіретін (түсі анық) пигменті:",
+                        options: [
+                            "Меланин",
+                            "Гемоглобин",
+                            "Билирубин",
+                            "Каротин"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Бауыр зақымданғанда бірінші кезекте бұзылатын процесс:",
+                        options: [
+                            "Майлардың қоры",
+                            "Өт түзілуі",
+                            "Бұлшықет жиырылуы",
+                            "Шаштың түзілуі"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бауырдың ең үлкен бөлімі қалай аталады?",
+                        options: [
+                            "Оң бөлік",
+                            "Сол бөлік",
+                            "Артқы бөлік",
+                            "Алдыңғы бөлік"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Өт қайда жиналады?",
+                        options: [
+                            "Асқазанда",
+                            "Өт қабында",
+                            "Ұлтабарда",
+                            "Жуан ішекте"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Гипатоксикалық әсер дегеніміз:",
+                        options: [
+                            "Жүректің альвеолаларға әсері",
+                            "Бауырдың улануға қарсы әрекеті",
+                            "Өттің бөлінуі",
+                            "Қантдың ыдырауы"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бауыр не себептен регенерацияға қабілетті?",
+                        options: [
+                            "Гепатоциттер тез бөліне алады",
+                            "Митохондриялар көп",
+                            "Өт көп бөлінеді",
+                            "Қан айналымы баяу"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Бауыр қандай затты залалсыздандырып, мочевинаға айналдырады?",
+                        options: [
+                            "Май",
+                            "Токсин",
+                            "Аммиак",
+                            "Глюкоза"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Бауырдың ас қорытуға қатысуының негізгі белгісі:",
+                        options: [
+                            "Гормон бөлу",
+                            "Өт түзу",
+                            "Жүйке талшықтарын түзу",
+                            "Қан түзу"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бауырдың сыртқы қабатын не қаптайды?",
+                        options: [
+                            "Фасция",
+                            "Плевра",
+                            "Қалың фиброзды қабық",
+                            "Сүйек қабығы"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Бауырдың негізгі қан жеткізетін тамыры:",
+                        options: [
+                            "Жүрек артериясы",
+                            "Қақпа (порталь) вена",
+                            "Ұсақ капиллярлар",
+                            "Аорта"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бауырдың зақымдануы нәтижесінде адамның терісі қандай түске айналады?",
+                        options: [
+                            "Қызыл",
+                            "Көгілдір",
+                            "Сарғыш",
+                            "Ақшыл"
+                        ],
+                        correctAnswer: 2
+                    }
+                ]
+            },
+            stomach: {
+                name: "Асқазан",
+                parts: 4,
+                function: "Асқазан - ас қорыту жүйесінің маңызды бөлігі. Ол тамақты қабылдап, механикалық және химиялық түрде өңдейді. Асқазан ас қышқылы мен ферменттер бөліп шығару арқылы тамақты ыдыратады.",
+                details: {
+                    parts: [
+                        { name: "Кардия", location: "top", description: "Өңешпен байланысады" },
+                        { name: "Түбі", location: "upper", description: "Ауа жинайды" },
+                        { name: "Денесі", location: "middle", description: "Негізгі қызмет" },
+                        { name: "Пилорикалық бөлік", location: "bottom", description: "Он екі ішекке өтеді" }
+                    ]
+                },
+                fact: "Асқазан шырышты қабырғасы күніне 2 литр шырыш бөледі. Асқазан сөлінің pH деңгейі 1,5-3,5 аралығында, бұл оны адам денесіндегі ең қышқыл орта етеді.",
+                audioDescription: "audio/stomach_description.mp3",
+                testQuestions: [
+                    {
+                        question: "Асқазан қай жүйеге жатады?",
+                        options: [
+                            "Тыныс алу жүйесі",
+                            "Ас қорыту жүйесі",
+                            "Қанайналым жүйесі",
+                            "Жүйке жүйесі"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Асқазандағы негізгі қызмет:",
+                        options: [
+                            "Ауаны тазаарту",
+                            "Қоректік заттарды сіңіру",
+                            "Тамақты сақтау және алғашқы қорытуды жүргізу",
+                            "Қан жасау"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Асқазан сөлінің құрамында қандай заттар бар?",
+                        options: [
+                            "Глюкоза, гликоген",
+                            "Пепсин, тұз қышқылы, слизь",
+                            "Ферменттер жоқ",
+                            "Қан жасайтын заттар"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Асқазан қабырғасы неше қабаттан тұрады?",
+                        options: [
+                            "2",
+                            "3",
+                            "4",
+                            "5"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Асқазанның ішкі қатпарлары қалай аталады?",
+                        options: [
+                            "Вилли",
+                            "Геликс",
+                            "Руга",
+                            "Перистальтика"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Асқазанның кішкене қисығы қандай аталады?",
+                        options: [
+                            "Curvatura major",
+                            "Curvatura minor",
+                            "Fundus",
+                            "Pylorus"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Асқазанның үлкен қисығы қалай аталады?",
+                        options: [
+                            "Curvatura major",
+                            "Curvatura minor",
+                            "Fundus",
+                            "Pylorus"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Асқазанды ашытатын бұлшықет жиырылуы қалай аталады?",
+                        options: [
+                            "Перистальтика",
+                            "Систола",
+                            "Диастола",
+                            "Тонус"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Асқазандағы қорытудың негізгі ферменті:",
+                        options: [
+                            "Липаза",
+                            "Амилаза",
+                            "Пепсин",
+                            "Лактоза"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Асқазанның төменгі бөлімі:",
+                        options: [
+                            "Fundus",
+                            "Corpus",
+                            "Pylorus",
+                            "Cardia"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Асқазанның жоғарғы бөлігі:",
+                        options: [
+                            "Fundus",
+                            "Corpus",
+                            "Pylorus",
+                            "Cardia"
+                        ],
+                        correctAnswer: 3
+                    },
+                    {
+                        question: "Асқазандағы қорғаныш слизь қай қызметті атқарады?",
+                        options: [
+                            "Қоректік заттарды сіңіреді",
+                            "Қабырғаны тұз қышқылынан қорғайды",
+                            "Ауа өткізеді",
+                            "Қан түзеді"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Пепсин қандай заттарды ыдыратады?",
+                        options: [
+                            "Майларды",
+                            "Көмірсуларды",
+                            "Ақуыздарды",
+                            "Витаминдерді"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Асқазан қақпақшасы (пилор) не істейді?",
+                        options: [
+                            "Тамақты өңештен қабылдайды",
+                            "Тамақты ішекке өткізеді",
+                            "Қан өткізеді",
+                            "Өт бөледі"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Асқазан сөлінің қышқылдығы қандай шамада?",
+                        options: [
+                            "pH 1–2",
+                            "pH 5–6",
+                            "pH 7",
+                            "pH 8–9"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Асқазанға қан жеткізетін негізгі тамыр:",
+                        options: [
+                            "Аорта",
+                            "Асқазан артериялары",
+                            "Қақпа вена",
+                            "Өкпе артериясы"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Асқазандағы қорытудың басталуы қайдан басталады?",
+                        options: [
+                            "Ауыздан",
+                            "Жіңішке ішектен",
+                            "Өңештен",
+                            "Ұйқы безінен"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Асқазан қабынуы қалай аталады?",
+                        options: [
+                            "Гастрит",
+                            "Бронхит",
+                            "Пневмония",
+                            "Колит"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Асқазанның құрылысына қандай ұлпалар қатысады?",
+                        options: [
+                            "Бұлшықет, шырышты, серозды қабат",
+                            "Жүйке ұлпасы тек",
+                            "Сүйек ұлпасы",
+                            "Лимфа ұлпасы"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Асқазандағы тамақ қандай күйге келеді?",
+                        options: [
+                            "Қатты",
+                            "Жартылай сұйық (химус)",
+                            "Газ тәрізді",
+                            "Толығымен сұйық"
+                        ],
+                        correctAnswer: 1
+                    }
+                ]
+            },
+            intestines: {
+                name: "Ішек",
+                parts: 2,
+                function: "Ішек - ас қорыту жүйесінің негізгі бөлігі. Ол асқазаннан кейін орналасқан және қоректік заттарды сіңіруге жауапты. Ішек жіңішке ішек пен қалың ішектен тұрады.",
+                details: {
+                    parts: [
+                        { name: "Жіңішке ішек", location: "top", description: "Қоректік заттарды сіңіреді" },
+                        { name: "Қалың ішек", location: "bottom", description: "Су сіңіреді" },
+                        { name: "Тік ішек", location: "bottom-right", description: "Зәр шығарады" }
+                    ]
+                },
+                fact: "Ішекте 100 триллион бактерия тіршілік етеді, бұл дене жасушаларынан 10 есе көп. Жіңішке ішектің ұзындығы шамамен 6-7 метрді құрайды.",
+                audioDescription: "audio/intestines_description.mp3",
+                testQuestions: [
+                    {
+                        question: "Ас қорыту жүйесіндегі ең ұзын мүшесі:",
+                        options: [
+                            "Асқазан",
+                            "Өңеш",
+                            "Жіңішке ішек",
+                            "Жуан ішек"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Жіңішке ішектің негізгі қызметі:",
+                        options: [
+                            "Суды сіңіру",
+                            "Тазаарту",
+                            "Қоректік заттарды сіңіру",
+                            "Өт бөлу"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Жіңішке ішектің бөліктерін дұрыс ретпен көрсет:",
+                        options: [
+                            "Мықын – он екі елі – аш ішек",
+                            "Аш ішек – он екі елі – мықын",
+                            "Он екі елі – аш ішек – мықын",
+                            "Он екі елі – мықын – аш ішек"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Жуан ішектің негізгі қызметі:",
+                        options: [
+                            "Майларды ыдырату",
+                            "Су мен минералдарды сіңіру",
+                            "Ақуыздарды қорыту",
+                            "Өт бөлу"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Жіңішке ішектегі бүрлердің қызметі:",
+                        options: [
+                            "Тағамды ұсақтау",
+                            "Асқазанды қорғау",
+                            "Сіңіру бетін үлкейту",
+                            "Тыныс алу"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Ішек перистальтикасы дегеніміз:",
+                        options: [
+                            "Асқазан сөлін бөлу",
+                            "Бұлшықеттердің ырғақты жиырылуы",
+                            "Өт бөлінуі",
+                            "Тағамның иістенуі"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Он елі ішекке қандай бездердің сөлі құйылады?",
+                        options: [
+                            "Тек өңеш",
+                            "Тек асқазан",
+                            "Ұйқы безі және бауыр",
+                            "Қалқанша без"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Жуан ішектің соңғы бөлімі:",
+                        options: [
+                            "Мықын ішек",
+                            "Тоқ ішек",
+                            "Тік ішек",
+                            "Соқыр ішек"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Соқыр ішекке жалғанып тұратын қалдық орган:",
+                        options: [
+                            "Өт қабы",
+                            "Қалқанша без",
+                            "Құрт тәрізді өсінді (аппендикс)",
+                            "Бүйрек"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Тағам құрамындағы май қай бөлікте ыдырай бастайды?",
+                        options: [
+                            "Ауызда",
+                            "Өңеште",
+                            "Он елі ішекте",
+                            "Жуан ішекте"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Жіңішке ішекте қорытылатын негізгі заттар:",
+                        options: [
+                            "Ақуыз, май, көмірсу",
+                            "Витаминдер ғана",
+                            "Тек майлар",
+                            "Тек ақуыздар"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Жіңішке ішектің ішкі бетіндегі қатпарлар, бүрлер және микро-бүрлер нені арттырады?",
+                        options: [
+                            "Қорғаныш қабатын",
+                            "Сіңіру ауданын",
+                            "Өңдеу жылдамдығын",
+                            "Асқазан сөлінің көлемін"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Жуан ішекте қандай процестер БОЛМАЙДЫ?",
+                        options: [
+                            "Судың сіңірілуі",
+                            "Минералдардың сіңірілуі",
+                            "Майлардың толық қорытуы",
+                            "Бактериялар әсері"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Жіңішке ішектің ұзындығы шамамен:",
+                        options: [
+                            "1 метр",
+                            "3–5 метр",
+                            "6–8 метр",
+                            "10 метрден жоғары"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Ас қорыту жүйесіндегі микроорганизмдер ең көп қай жерде кездеседі?",
+                        options: [
+                            "Өңеште",
+                            "Асқазанда",
+                            "Жіңішке ішекте",
+                            "Жуан ішекте"
+                        ],
+                        correctAnswer: 3
+                    },
+                    {
+                        question: "Ең бірінші қорытылу басталатын орын:",
+                        options: [
+                            "Жіңішке ішек",
+                            "Асқазан",
+                            "Ауыз қуысы",
+                            "Өңеш"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Күрделі көмірсулардың соңғы ыдырау өнімі:",
+                        options: [
+                            "Глицерин",
+                            "Глюкоза",
+                            "Аминқышқылдар",
+                            "Қышқылдар"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Ақуыздардың соңғы ыдырау өнімі:",
+                        options: [
+                            "Майлар",
+                            "Аминқышқылдары",
+                            "Су",
+                            "Глюкоза"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Жуан ішектегі негізгі бактериялардың бірі:",
+                        options: [
+                            "Туберкулез микробтары",
+                            "Лактобактериялар",
+                            "Вирус",
+                            "Паразит құрт"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Ішек қабырғасын қалың әрі жылжымалы ететін бөлім:",
+                        options: [
+                            "Шырышты қабық",
+                            "Етті қабат (перистальтика)",
+                            "Серозды қабық",
+                            "Дендрит"
+                        ],
+                        correctAnswer: 1
+                    }
+                ]
+            },
+            kidneys: {
+                name: "Бүйрек",
+                parts: 2,
+                function: "Бүйрек - зәр шығару жүйесінің негізгі ағзасы. Ол қанды тазартады, зәр түзеді және денедегі су-тұз балансын реттейді. Бүйректер белдің екі жағында орналасқан.",
+                details: {
+                    parts: [
+                        { name: "Бүйрек қабығы", location: "outer", description: "Сүзгі" },
+                        { name: "Бүйрек миы", location: "inner", description: "Қан тамырлары" },
+                        { name: "Бүйрек лоханкасы", location: "center", description: "Зәр жинайды" }
+                    ]
+                },
+                fact: "Бүйрек күніне 180 литр қанды сүзеді, бірақ тек 1,5 литр зәр шығарады. Әр бүйрек шамамен 1 миллион нефроннан тұрады.",
+                audioDescription: "audio/kidneys_description.mp3",
+                testQuestions: [
+                    {
+                        question: "Бүйрек қандай жүйеге жатады?",
+                        options: [
+                            "Ас қорыту жүйесі",
+                            "Зәр шығару жүйесі",
+                            "Қанайналым жүйесі",
+                            "Жүйке жүйесі"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Ересек адамда бүйрек саны:",
+                        options: [
+                            "1",
+                            "2",
+                            "3",
+                            "4"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бүйректің негізгі қызметі:",
+                        options: [
+                            "Қан жасау",
+                            "Қан құрамын реттеу, сұйықтық пен тұзды баланс сақтау, токсиндерді шығару",
+                            "Газ алмасу",
+                            "Қимылды үйлестіру"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бүйректің сыртқы қабығы қалай аталады?",
+                        options: [
+                            "Кортекс (сұр зат)",
+                            "Мозговое вещество (ақ зат)",
+                            "Капсула",
+                            "Плевра"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Бүйректің ішкі бөлімі қалай аталады?",
+                        options: [
+                            "Кортекс",
+                            "Мозговое вещество (шамалы конустар)",
+                            "Перикард",
+                            "Плевра"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бүйректегі бірлік құрылым қалай аталады?",
+                        options: [
+                            "Нефрон",
+                            "Гломерула",
+                            "Альвеола",
+                            "Аксон"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Нефрон қандай бөліктерден тұрады?",
+                        options: [
+                            "Бүйрек қабығы ғана",
+                            "Бауыр мен өт қабы",
+                            "Бүйрек түтікшесі және гломерула",
+                            "Микроскопиялық бұлшықет талшықтары"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Гломерула қандай қызмет атқарады?",
+                        options: [
+                            "Қан сүзу",
+                            "Ас қорытуды бастау",
+                            "Қан айналымын жылдамдату",
+                            "Жүйке импульсын өткізу"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Зәр түтікшелері не істейді?",
+                        options: [
+                            "Қанды сүзеді",
+                            "Сүзілген зәрді бүйрек түтікшелеріне өткізеді",
+                            "Қан қысымын көтереді",
+                            "Газ алмасу жүргізеді"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бүйректің қанмен қамтамасыз етілуі қандай тамыр арқылы жүреді?",
+                        options: [
+                            "Аорта",
+                            "Бүйрек артериясы",
+                            "Қақпа вена",
+                            "Жүрек артериясы"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бүйректің шығарған зәрі қандай түсті болады?",
+                        options: [
+                            "Сарғыш",
+                            "Қызыл",
+                            "Қара",
+                            "Көгілдір"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Бүйректің негізгі гормоны қандай?",
+                        options: [
+                            "Инсулин",
+                            "Адреналин",
+                            "Ренин",
+                            "Тестостерон"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Бүйрек неше бөліктен тұрады?",
+                        options: [
+                            "2",
+                            "3",
+                            "4",
+                            "5"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бүйрек ауруларының бірі:",
+                        options: [
+                            "Гастрит",
+                            "Пневмония",
+                            "Нефрит",
+                            "Бронхит"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Бүйректің негізгі қызметі емес:",
+                        options: [
+                            "Қан сүзу",
+                            "Тұздарды реттеу",
+                            "Глюкозаны сақтау",
+                            "Жүйке импульсын өткізу"
+                        ],
+                        correctAnswer: 3
+                    },
+                    {
+                        question: "Зәр шығару жолы арқылы зәр бүйректен қайда өтеді?",
+                        options: [
+                            "Ұйқы безіне",
+                            "Бауырға",
+                            "Зәр қапшығына, содан соң зәр шығару түтігіне",
+                            "Асқазанға"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Бүйректің фильтр қызметі қай бөлікте жүреді?",
+                        options: [
+                            "Бүйрек түтікшесінде",
+                            "Гломерулада",
+                            "Ұйқы безінде",
+                            "Асқазанда"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бүйрек қызметін бақылайтын жүйе:",
+                        options: [
+                            "Жүйке жүйесі және гормондық жүйе",
+                            "Ас қорыту жүйесі",
+                            "Тыныс алу жүйесі",
+                            "Иммундық жүйе"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Бүйректің адам ағзасында орналасуы:",
+                        options: [
+                            "Құрсақ қуысында, арқа екі жағында",
+                            "Кеуде қуысында",
+                            "Бас қуысы ішінде",
+                            "Жамбас қуысында"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Бүйректің регуляторлық қызметі:",
+                        options: [
+                            "Қан қысымын, су-тұз тепе-теңдігін сақтау",
+                            "Газ алмасуды реттеу",
+                            "Қоректік заттарды сіңіру",
+                            "Ас қорыту ферменттерін өндіру"
+                        ],
+                        correctAnswer: 0
+                    }
+                ]
+            },
+            skeleton: {
+                name: "Қаңқа",
+                parts: 4,
+                function: "Қаңқа - дененің негізгі тірек жүйесі. Денеге пішін береді, ішкі ағзаларды қорғайды, қозғалысқа мүмкіндік береді және қан жасушаларын өндіреді. Қаңқа сүйектерден, буындардан және шеміршектерден тұрады.",
+                details: {
+                    parts: [
+                        { name: "Бас сүйек", location: "top", description: "Миды және сезім ағзаларын қорғайды" },
+                        { name: "Омыртқа бағанасы", location: "center", description: "Дененің негізгі тірегі, жүйке жүйесін қорғайды" },
+                        { name: "Кеуде қаңқасы", location: "upper", description: "Жүрек пен өкпелерді қорғайды" },
+                        { name: "Қол-аяқ сүйектері", location: "bottom", description: "Қозғалысқа мүмкіндік береді" }
+                    ]
+                },
+                fact: "Адам қаңқасы 206 сүйектен тұрады, бұл жаңа туған нәрестеде 270-ке жуық сүйек болады. Адамның ең ұзын сүйегі - саны.",
+                audioDescription: "audio/skeleton_description.mp3",
+                testQuestions: [
+                    {
+                        question: "Қаңқаның негізгі қызметі қандай?",
+                        options: [
+                            "Зат алмасуды реттеу",
+                            "Денеге тірек беру және қозғалысқа қатысу",
+                            "Қан айналымын қамтамасыз ету",
+                            "Жүйке импульстарын өткізу"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Адам қаңқасы нешеге бөлінеді?",
+                        options: [
+                            "2",
+                            "3",
+                            "4",
+                            "5"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Бас сүйегінің ми сауытына қай сүйектер жатады?",
+                        options: [
+                            "Жауырын, бұғана",
+                            "Маңдай, төбе, шүйде",
+                            "Жамбас сүйектері",
+                            "Таңдай сүйегі"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Омыртқа жотасында қанша омыртқа бар?",
+                        options: [
+                            "20",
+                            "26",
+                            "33–34",
+                            "40"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Омыртқа жотасының ең қозғалмалы бөлімі:",
+                        options: [
+                            "Бел омыртқалары",
+                            "Көкірек омыртқалары",
+                            "Құйымшақ",
+                            "Мойын омыртқалары"
+                        ],
+                        correctAnswer: 3
+                    },
+                    {
+                        question: "Адам қаңқасындағы ең ұзын сүйек:",
+                        options: [
+                            "Жауырын",
+                            "Шынтақ",
+                            "Сан сүйегі",
+                            "Жіліншік"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Қабырғалардың саны:",
+                        options: [
+                            "10 жұп",
+                            "11 жұп",
+                            "12 жұп",
+                            "13 жұп"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Буын дегеніміз не?",
+                        options: [
+                            "Бұлшықет байланысы",
+                            "Сүйектердің қозғалмалы байланысы",
+                            "Нерв талшықтарының жиынтығы",
+                            "Хрящ ұлпасының түрі"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Тізе буыны қандай буын түріне жатады?",
+                        options: [
+                            "Күпшек буын",
+                            "Ер-тоқым тәрізді буын",
+                            "Шар тәрізді буын",
+                            "Топсалы буын"
+                        ],
+                        correctAnswer: 3
+                    },
+                    {
+                        question: "Қаңқадағы сүйектердің беріктігін қамтамасыз ететін зат:",
+                        options: [
+                            "Май",
+                            "Коллаген",
+                            "Кальций тұздары",
+                            "Глюкоза"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        question: "Жамбас сүйегінің қызметі:",
+                        options: [
+                            "Миды қорғау",
+                            "Ішкі ағзаларды қорғау және тірек беру",
+                            "Қол қимылдарын үйлестіру",
+                            "Тыныс алу"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Қаңқаның қан жасау функциясы қай бөлімінде жүреді?",
+                        options: [
+                            "Сүйектердің қабығында",
+                            "Сүйектердің қызыл ілігінде",
+                            "Сүйек майында",
+                            "Хрящта"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Сүйектің сыртқы қабығы қалай аталады?",
+                        options: [
+                            "Эпифиз",
+                            "Диафиз",
+                            "Надыр",
+                            "Периост"
+                        ],
+                        correctAnswer: 3
+                    },
+                    {
+                        question: "Қабырғалар мен төс сүйегі қандай қуысты құрайды?",
+                        options: [
+                            "Бассүйек",
+                            "Кеуде",
+                            "Құрсақ",
+                            "Жамбас"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Қол сүйектерінің саны:",
+                        options: [
+                            "30",
+                            "32",
+                            "34",
+                            "36"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Аяқ сүйектерінің саны:",
+                        options: [
+                            "28",
+                            "30",
+                            "32",
+                            "34"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Сүйектердің ішіндегі қызыл ілік не үшін жауапты?",
+                        options: [
+                            "Қан жасау",
+                            "Май жинау",
+                            "Минералдарды сақтау",
+                            "Энергия өндіру"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        question: "Қаңқаның ең кішкентай сүйегі:",
+                        options: [
+                            "Бақай сүйек",
+                            "Құлақ сүйекшелері",
+                            "Мүйіз тәрізді сүйек",
+                            "Тіл сүйегі"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Омыртқа бағанасының негізгі қызметі:",
+                        options: [
+                            "Миды қорғау",
+                            "Тірек болу және жүйке жүйесін қорғау",
+                            "Қозғалысқа мүмкіндік беру",
+                            "Ішкі ағзаларды бекіту"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Сүйектердің өсуі қай жаста тоқтайды?",
+                        options: [
+                            "10 жаста",
+                            "15 жаста",
+                            "20-25 жаста",
+                            "30 жаста"
+                        ],
+                        correctAnswer: 2
+                    }
+                ]
+            }
+        };
+
+        // Ағза суреттерінің жолдары
+        const organImages = {
+            brain: 'images/brain.png',
+            heart: 'images/heart.png',
+            lungs: 'images/lungs.png',
+            liver: 'images/liver.png',
+            stomach: 'images/stomach.png',
+            intestines: 'images/intestines.png',
+            kidneys: 'images/kidneys.png',
+            skeleton: 'images/skeleton.png'
+        };
+
+        // 3D МОДЕЛЬДЕРДІҢ БАЗАСЫ
+        const organ3DModels = {
+            heart: {
+                embedUrl: "https://sketchfab.com/models/168b474fba564f688048212e99b4159d/embed",
+                type: "sketchfab"
+            },
+            heartThromb: {
+                embedUrl: "https://human.biodigital.com/viewer/?id=5SHI&ui-anatomy-descriptions=true&ui-anatomy-pronunciations=true&ui-anatomy-labels=true&ui-audio=true&ui-chapter-list=false&ui-fullscreen=true&ui-help=true&ui-info=true&ui-label-list=true&ui-layers=true&ui-loader=circle&ui-media-controls=full&ui-menu=true&ui-nav=true&ui-search=true&ui-tools=true&ui-tutorial=false&ui-undo=true&ui-whiteboard=true&initial.none=true&disable-scroll=false&uaid=Ls4vB&paid=o_0b4e4ad7",
+                type: "biodigital",
+                name: "Қан тамырдағы тромб"
+            },
+            brain: {
+                embedUrl: "https://sketchfab.com/models/f5177aa5722a46e286114b155a4a3490/embed",
+                type: "sketchfab"
+            },
+            lungs: {
+                embedUrl: "https://sketchfab.com/models/6299e58c80ce41e7ae2a064c3ed2754e/embed",
+                type: "sketchfab"
+            },
+            liver: {
+                embedUrl: "https://sketchfab.com/models/08ee1a75c6fa437297848027c1baa94c/embed",
+                type: "sketchfab"
+            },
+            stomach: {
+                embedUrl: "https://sketchfab.com/models/a322aecd494443859caefbbc7205c4be/embed",
+                type: "sketchfab"
+            },
+            intestines: {
+                embedUrl: "https://sketchfab.com/models/ba6f67ee78f249dd85ce316379d10629/embed",
+                type: "sketchfab"
+            },
+            kidneys: {
+                embedUrl: "https://sketchfab.com/models/686992c2a7fb456eaa8997b0366f4062/embed",
+                type: "sketchfab"
+            },
+            skeleton: {
+                embedUrl: "https://sketchfab.com/models/6a7a537a71444f6e8201e18a685a013d/embed?autostart=1&camera=0&preload=1&dnt=1",
+                type: "sketchfab"
+            }
+        };
+
+        // ДЫБЫС ОЙНАТҚЫШ КОМПОНЕНТІ
+        const AudioPlayer = ({ audioUrl, organName }) => {
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [currentTime, setCurrentTime] = useState(0);
+            const [duration, setDuration] = useState(0);
+            const [volume, setVolume] = useState(0.7);
+            const audioRef = useRef(null);
+            const progressBarRef = useRef(null);
+            const volumeSliderRef = useRef(null);
+
+            useEffect(() => {
+                const audio = audioRef.current;
+                if (!audio) return;
+
+                const updateTime = () => setCurrentTime(audio.currentTime);
+                const updateDuration = () => setDuration(audio.duration);
+                const updateVolume = () => setVolume(audio.volume);
+
+                audio.addEventListener('timeupdate', updateTime);
+                audio.addEventListener('loadedmetadata', updateDuration);
+                audio.addEventListener('volumechange', updateVolume);
+
+                return () => {
+                    audio.removeEventListener('timeupdate', updateTime);
+                    audio.removeEventListener('loadedmetadata', updateDuration);
+                    audio.removeEventListener('volumechange', updateVolume);
+                };
+            }, []);
+
+            const togglePlay = () => {
+                if (audioRef.current) {
+                    if (isPlaying) {
+                        audioRef.current.pause();
+                    } else {
+                        audioRef.current.play();
+                    }
+                    setIsPlaying(!isPlaying);
+                }
+            };
+
+            const handleEnded = () => {
+                setIsPlaying(false);
+                setCurrentTime(0);
+            };
+
+            const formatTime = (seconds) => {
+                if (isNaN(seconds)) return "0:00";
+                const min = Math.floor(seconds / 60);
+                const sec = Math.floor(seconds % 60);
+                return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+            };
+
+            const handleProgressClick = (e) => {
+                if (!audioRef.current || !progressBarRef.current) return;
+                
+                const progressBar = progressBarRef.current;
+                const clickPosition = e.clientX - progressBar.getBoundingClientRect().left;
+                const progressBarWidth = progressBar.clientWidth;
+                const percentage = clickPosition / progressBarWidth;
+                
+                audioRef.current.currentTime = percentage * duration;
+            };
+
+            const handleVolumeClick = (e) => {
+                if (!audioRef.current || !volumeSliderRef.current) return;
+                
+                const volumeSlider = volumeSliderRef.current;
+                const clickPosition = e.clientX - volumeSlider.getBoundingClientRect().left;
+                const volumeSliderWidth = volumeSlider.clientWidth;
+                const newVolume = Math.max(0, Math.min(1, clickPosition / volumeSliderWidth));
+                
+                audioRef.current.volume = newVolume;
+                setVolume(newVolume);
+            };
+
+            if (!audioUrl) {
+                return null;
+            }
+
+            return (
+                <div className="compact-audio-player">
+                    <div className="compact-progress-area">
+                        <div 
+                            className="compact-progress-bar" 
+                            ref={progressBarRef}
+                            onClick={handleProgressClick}
+                        >
+                            <div 
+                                className="compact-progress" 
+                                style={{width: duration ? `${(currentTime / duration) * 100}%` : '0%'}}
+                            ></div>
+                        </div>
+                        <div className="compact-time">
+                            <span className="compact-current">{formatTime(currentTime)}</span>
+                            <span className="compact-duration">{formatTime(duration)}</span>
+                        </div>
+                    </div>
+                    
+                    <div className="compact-controls-container">
+                        <div className="compact-playback-controls">
+                            <button className="compact-control-btn compact-prev-btn">⏮</button>
+                            <button className="compact-control-btn compact-play-pause" onClick={togglePlay}>
+                                {isPlaying ? '⏸' : '▶'}
+                            </button>
+                            <button className="compact-control-btn compact-next-btn">⏭</button>
+                        </div>
+                        
+                        <div className="compact-volume-control">
+                            <span className="compact-volume-icon" style={{fontSize: '10px'}}>🔊</span>
+                            <div 
+                                className="compact-volume-slider" 
+                                ref={volumeSliderRef}
+                                onClick={handleVolumeClick}
+                            >
+                                <div 
+                                    className="compact-volume-percent" 
+                                    style={{width: `${volume * 100}%`}}
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <audio 
+                        ref={audioRef}
+                        onEnded={handleEnded}
+                        style={{ display: 'none' }}
+                    >
+                        <source src={audioUrl} type="audio/mpeg" />
+                        Сіздің браузеріңіз аудио элементін қолдамайды.
+                    </audio>
+                </div>
+            );
+        };
+
+        // 3D Модель компоненті
+        const Organ3DModel = ({ organType }) => {
+            const model = organ3DModels[organType];
+            
+            if (!model) {
+                return (
+                    <div style={{width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                        <div style={{fontSize: '4em', marginBottom: '20px'}}>
+                            {organType === 'brain' ? '🧠' :
+                             organType === 'heart' ? '❤️' :
+                             organType === 'lungs' ? '🫁' :
+                             organType === 'liver' ? '🟫' :
+                             organType === 'stomach' ? '🟨' :
+                             organType === 'intestines' ? '🟠' :
+                             organType === 'kidneys' ? '🟦' :
+                             organType === 'skeleton' ? '🦴' : '🔬'}
+                        </div>
+                        <h3 style={{color: 'var(--dark-color)', marginBottom: '20px'}}>
+                            {organData[organType]?.name || organType}
+                        </h3>
+                        <p style={{color: '#6c757d', textAlign: 'center'}}>
+                            3D модель әлі қосылмаған
+                        </p>
+                    </div>
+                );
+            }
+
+            if (model.type === "sketchfab") {
+                return (
+                    <div className="sketchfab-embed-wrapper">
+                        <iframe 
+                            title={`3d ${organData[organType]?.name || organType} модель`}
+                            frameBorder="0" 
+                            allowFullScreen 
+                            mozallowfullscreen="true" 
+                            webkitallowfullscreen="true" 
+                            allow="autoplay; fullscreen; xr-spatial-tracking" 
+                            xr-spatial-tracking 
+                            execution-while-out-of-viewport 
+                            execution-while-not-rendered 
+                            web-share 
+                            width="100%" 
+                            height="100%" 
+                            src={model.embedUrl}
+                        >
+                        </iframe>
+                    </div>
+                );
+            }
+
+            if (model.type === "biodigital") {
+                return (
+                    <div className="sketchfab-embed-wrapper">
+                        <iframe
+                            src={model.embedUrl}
+                            width="100%"
+                            height="100%"
+                            frameBorder="0"
+                            allowFullScreen
+                            title="BioDigital 3D Model"
+                            style={{border: 'none', borderRadius: '10px'}}
+                        />
+                    </div>
+                );
+            }
+
+            return (
+                <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                    <p>Бұл типтегі модель әлі қолдауы жоқ</p>
+                </div>
+            );
+        };
+
+        // Тест компоненті
+        const OrganTest = ({ questions, organKey }) => {
+            const [selectedAnswers, setSelectedAnswers] = useState([]);
+            const [showResults, setShowResults] = useState(false);
+            
+            const handleAnswerSelect = (questionIndex, answerIndex) => {
+                const newSelectedAnswers = [...selectedAnswers];
+                newSelectedAnswers[questionIndex] = answerIndex;
+                setSelectedAnswers(newSelectedAnswers);
+            };
+            
+            const handleShowResults = () => {
+                setShowResults(true);
+            };
+            
+            const handleRestartTest = () => {
+                setSelectedAnswers([]);
+                setShowResults(false);
+            };
+            
+            const calculateScore = () => {
+                let correct = 0;
+                questions.forEach((question, index) => {
+                    if (selectedAnswers[index] === question.correctAnswer) {
+                        correct++;
+                    }
+                });
+                return correct;
+            };
+            
+            if (questions.length === 0) {
+                return (
+                    <div className="test-section">
+                        <h3>Тест сұрақтары</h3>
+                        <p>Бұл ағза үшін тест сұрақтары әлі дайындалмаған.</p>
+                    </div>
+                );
+            }
+            
+            if (showResults) {
+                const score = calculateScore();
+                const percentage = Math.round((score / questions.length) * 100);
+                
+                return (
+                    <div className="test-section">
+                        <h3>Тест нәтижесі</h3>
+                        <div className="test-results">
+                            <h4>Сіз {score} / {questions.length} сұраққа дұрыс жауап бердіңіз</h4>
+                            <p>{percentage}%</p>
+                            
+                            {questions.map((question, index) => (
+                                <div key={index} className="question-review">
+                                    <p><strong>{index + 1}. {question.question}</strong></p>
+                                    <p>
+                                        Сіздің жауабыңыз: 
+                                        <span style={{color: selectedAnswers[index] === question.correctAnswer ? '#28a745' : '#dc3545', fontWeight: 'bold'}}>
+                                            {question.options[selectedAnswers[index]]}
+                                        </span>
+                                    </p>
+                                    {selectedAnswers[index] !== question.correctAnswer && (
+                                        <p className="correct-answer">
+                                            Дұрыс жауап: {question.options[question.correctAnswer]}
+                                        </p>
+                                    )}
+                                </div>
+                            ))}
+                            
+                            <button className="model-btn" onClick={handleRestartTest} style={{marginTop: '15px'}}>
+                                Тестті қайта бастау
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+            
+            return (
+                <div className="test-section">
+                    <h3>Тест сұрақтары ({questions.length} сұрақ)</h3>
+                    
+                    <div className="all-questions-container">
+                        {questions.map((question, index) => (
+                            <div key={index} className="test-question">
+                                <h4>{index + 1}. {question.question}</h4>
+                                <div className="test-options">
+                                    {question.options.map((option, optionIndex) => {
+                                        const isSelected = selectedAnswers[index] === optionIndex;
+                                        let optionClass = 'test-option';
+                                        if (isSelected) {
+                                            optionClass += ' selected';
+                                        }
+                                        
+                                        return (
+                                            <div
+                                                key={optionIndex}
+                                                className={optionClass}
+                                                onClick={() => handleAnswerSelect(index, optionIndex)}
+                                            >
+                                                {String.fromCharCode(65 + optionIndex)}) {option}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div className="game-controls" style={{marginTop: '20px'}}>
+                        <button 
+                            className="model-btn" 
+                            onClick={handleShowResults}
+                            disabled={selectedAnswers.length !== questions.length}
+                        >
+                            Тестті аяқтау
+                        </button>
+                        
+                        <button 
+                            className="model-btn" 
+                            onClick={handleRestartTest}
+                            style={{marginLeft: '10px', background: '#6c757d'}}
+                        >
+                            Қайта бастау
+                        </button>
+                    </div>
+                    
+                    <div style={{marginTop: '15px', color: '#6c757d'}}>
+                        Жауап берілген сұрақтар: {selectedAnswers.length}/{questions.length}
+                    </div>
+                </div>
+            );
+        };
+
+        // Ағза суреті компоненті
+        const OrganImage = ({ organType, size = '40px' }) => {
+            if (!organType || !organImages[organType]) {
+                return (
+                    <div style={{ 
+                        width: size, 
+                        height: size,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: '#f0f0f0',
+                        borderRadius: '5px',
+                        fontSize: '1.5em'
+                    }}>
+                        {organType === 'brain' ? '🧠' :
+                         organType === 'heart' ? '❤️' :
+                         organType === 'lungs' ? '🫁' :
+                         organType === 'liver' ? '🟫' :
+                         organType === 'stomach' ? '🟨' :
+                         organType === 'intestines' ? '🟠' :
+                         organType === 'kidneys' ? '🟦' :
+                         organType === 'skeleton' ? '🦴' : '🔬'}
+                    </div>
+                );
+            }
+            
+            const altText = organData[organType]?.name || organType;
+            
+            return (
+                <img 
+                    src={organImages[organType]} 
+                    alt={altText}
+                    style={{ 
+                        width: size, 
+                        height: size,
+                        objectFit: 'contain'
+                    }}
+                />
+            );
+        };
+
+        // Негізгі компонент
+        const AnatomyLab = () => {
+            const [selectedOrgan, setSelectedOrgan] = useState(null);
+            const [currentMode, setCurrentMode] = useState('view');
+            const [selectedModel, setSelectedModel] = useState(null);
+            
+            const handleOrganSelect = (organType) => {
+                setSelectedOrgan(organType);
+                setSelectedModel(organType);
+                setCurrentMode('view');
+            };
+            
+            const handleModeChange = (mode) => {
+                setCurrentMode(mode);
+            };
+            
+            const handleModelChange = (modelType) => {
+                setSelectedModel(modelType);
+            };
+            
+            const renderOrganDetail = () => {
+                if (!selectedOrgan) return null;
+                
+                const organ = organData[selectedOrgan];
+                if (!organ) return null;
+                
+                const hasAdditionalModels = organ.additionalModels && organ.additionalModels.length > 0;
+                
+                return (
+                    <div className="organ-detail" style={{display: 'flex', flexDirection: 'column'}}>
+                        <div className="game-mode-selector">
+                            <button 
+                                className={`mode-btn ${currentMode === 'view' ? 'active' : ''}`}
+                                onClick={() => handleModeChange('view')}
+                            >
+                                Қарау
+                            </button>
+                            <button 
+                                className={`mode-btn ${currentMode === 'test' ? 'active' : ''}`}
+                                onClick={() => handleModeChange('test')}
+                            >
+                                Тест
+                            </button>
+                        </div>
+                        
+                        {currentMode === 'view' && (
+                            <>
+                                {hasAdditionalModels && (
+                                    <div className="model-selector">
+                                        <h4>Модель түрін таңдаңыз:</h4>
+                                        <div className="model-buttons">
+                                            <button 
+                                                className={`model-type-btn ${selectedModel === selectedOrgan ? 'active' : ''}`}
+                                                onClick={() => handleModelChange(selectedOrgan)}
+                                            >
+                                                {organ.name}
+                                            </button>
+                                            {organ.additionalModels.map((model, index) => (
+                                                <button 
+                                                    key={index}
+                                                    className={`model-type-btn ${selectedModel === model.key ? 'active' : ''}`}
+                                                    onClick={() => handleModelChange(model.key)}
+                                                >
+                                                    {model.name}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                <div className="organ-image-container">
+                                    <Organ3DModel organType={selectedModel} />
+                                </div>
+                                
+                                <div style={{marginTop: '15px'}}>
+                                    <h5 style={{color: 'var(--dark-color)', marginBottom: '10px'}}>
+                                        🎧 {organ.name} туралы анықтама
+                                    </h5>
+                                    <AudioPlayer 
+                                        audioUrl={organ.audioDescription} 
+                                        organName={organ.name}
+                                    />
+                                </div>
+                                
+                                <div className="organ-info">
+                                    <h2>
+                                        {selectedModel === selectedOrgan 
+                                            ? organ.name 
+                                            : organ3DModels[selectedModel]?.name || organ.name
+                                        }
+                                    </h2>
+                                    
+                                    {selectedModel !== selectedOrgan && hasAdditionalModels && (
+                                        organ.additionalModels.map((model, index) => (
+                                            model.key === selectedModel && (
+                                                <div key={index} className="organ-fact">
+                                                    <p>{model.description}</p>
+                                                </div>
+                                            )
+                                        ))
+                                    )}
+                                    
+                                    <p><strong>Негізгі функциясы:</strong> {organ.function}</p>
+                                    
+                                    <p><strong>Бөлімдер саны:</strong> {organ.parts}</p>
+                                    
+                                    {organ.details && (
+                                        <>
+                                            <h3 style={{marginTop: '20px', color: 'var(--dark-color)'}}>Бөлімдері:</h3>
+                                            <ul style={{marginLeft: '20px'}}>
+                                                {organ.details.parts.map((part, index) => (
+                                                    <li key={index} style={{marginBottom: '10px'}}>
+                                                        <strong>{part.name}:</strong> {part.description}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </>
+                                    )}
+                                    
+                                    <div className="organ-fact">
+                                        <strong>Қызықты факт:</strong> {organ.fact}
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                        
+                        {currentMode === 'test' && (
+                            <OrganTest 
+                                key={selectedOrgan}
+                                questions={organ.testQuestions || []} 
+                                organKey={selectedOrgan}
+                            />
+                        )}
+                    </div>
+                );
+            };
+            
+            return (
+                <div className="main-container">
+                    <div className="header">
+                        <h1>🎓 Физиологиялық процестердің симуляциясы</h1>
+                        <p> </p>
+                    </div>
+                    
+                    <div className="content">
+                        <div className="image-section">
+                            <div className="human-image-container">
+                                <img src="https://img.freepik.com/free-vector/human-model-with-organs_1308-24148.jpg?w=360" 
+                                     alt="Адам денесі" 
+                                     className="human-image" />
+                            </div>
+                            
+                            <h5>Ағзаны таңдаңыз:</h5>
+                            <div className="organ-buttons">
+                                {Object.keys(organData).map(organType => (
+                                    <button
+                                        key={organType}
+                                        className={`organ-btn ${selectedOrgan === organType ? 'active' : ''}`}
+                                        onClick={() => handleOrganSelect(organType)}
+                                    >
+                                        <span className="organ-icon">
+                                            <OrganImage 
+                                                organType={organType} 
+                                                size="40px"
+                                            />
+                                        </span>
+                                        <span className="organ-name">
+                                            {organData[organType].name}
+                                        </span>
+                                        {organ3DModels[organType] && (
+                                            <span style={{marginLeft: 'auto', fontSize: '12px', color: 'var(--primary-color)'}}>
+                                                3D
+                                            </span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        <div className="controls-section">
+                            <div className="info-section">
+                                {!selectedOrgan ? (
+                                    <div className="default-message">
+                                        <div style={{width: '100%', height: '400px', marginBottom: '20px'}}>
+                                            <Organ3DModel organType="skeleton" />
+                                        </div>
+                                        <div>
+                                            <div style={{fontSize: '4em'}}>👆</div>
+                                            <p>
+                                                Ағза туралы ақпаратты көру үшін сол жақтағы ағзаны таңдаңыз
+                                            </p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    renderOrganDetail()
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // React компонентін DOM-ға қосу
+        ReactDOM.render(<AnatomyLab />, document.getElementById('root'));
+    </script>
+</body>
+</html>
